@@ -36,10 +36,8 @@ jobs:
 
     steps:
       - name: Free space
-        run: |
-          cd /opt
-          find . -maxdepth 1 -mindepth 1 '!' -path ./containerd '!' -path ./actionarchivecache '!' -path ./runner '!' -path ./runner-cache -exec rm -rf '{}' ';'
-      
+        run: rm -rf /opt/hostedtoolcache
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
