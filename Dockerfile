@@ -1,9 +1,26 @@
 # Start from the latest Swift nightly main toolchain
-FROM ubuntu:25.10
+FROM docker.io/ubuntu:latest
+LABEL org.opencontainers.image.title="Swift Matter Builder"
+LABEL org.opencontainers.image.description="Build environment for swift-matter on esp32c6. Contains esp-idf (master), esp-matter (main), swift (main-snapshot), and dependencies"
+LABEL org.opencontainers.image.source=https://github.com/TheNightmanCodeth/esp-swift
+LABEL org.opencontainers.image.licenses=Apache-2.0
+
 # The number of submodules fetched at the same time
-ARG GIT_CLONE_JOBS=24
+# (Bump this if you've allocated a good chunk of RAM to the builder)
+# Note: Builds continuously stall and fail using apple/container when this is
+# set to i.e., 24. I'm not sure why. I don't know the limit either. 2 usually
+# works. Building with docker isn't quite as spotty but still not great. It's
+# not like setting it to 24 instead is really that much faster anyway. \rant
+ARG GIT_CLONE_JOBS=2
+
 # Install ESP-IDF dependencies
-RUN apt-get update && apt-get install --yes --no-install-recommends binutils cmake curl git gnupg2 libc6-dev libcurl4-openssl-dev libncurses5-dev libedit2 libgcc-13-dev libpython3-dev libsqlite3-0 libstdc++-13-dev libxml2-dev libz3-dev pkg-config tzdata zlib1g-dev wget flex bison gperf python3 python3-pip python3-venv ninja-build ccache libffi-dev libssl-dev build-essential python3-dev dfu-util libusb-1.0-0 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install --yes --no-install-recommends \
+  binutils cmake curl git gnupg2 libc6-dev libcurl4-openssl-dev \
+  libncurses5-dev libedit2 libgcc-13-dev libpython3-dev libsqlite3-0 \
+  libstdc++-13-dev libxml2-dev libz3-dev pkg-config tzdata zlib1g-dev wget \
+  flex bison gperf python3 python3-pip python3-venv ninja-build ccache \
+  libffi-dev libssl-dev build-essential python3-dev dfu-util libusb-1.0-0 \
+  && rm -rf /var/lib/apt/lists/*
 
 # Install swift
 ARG SWIFT_SIGNING_KEY=E813C892820A6FA13755B268F167DF1ACF9CE069
