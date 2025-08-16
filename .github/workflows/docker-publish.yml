@@ -21,7 +21,7 @@ env:
   IMAGE_NAME: esp-matter
 jobs:
   build:
-    runs-on: sprinters:aws:ap-south-1:ubuntu-latest:t4g.large:temp=64
+    runs-on: sprinters:aws:ap-south-1:ubuntu-latest:t3.large:temp=64
     permissions:
       contents: read
       packages: write
