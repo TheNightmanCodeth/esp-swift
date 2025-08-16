@@ -18,10 +18,10 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: esp-matter
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: sprinters:aws:ap-south-1:ubuntu-latest:t4g.large:temp=64
     permissions:
       contents: read
       packages: write
