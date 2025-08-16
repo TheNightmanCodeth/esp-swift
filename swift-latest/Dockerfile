@@ -1,16 +1,12 @@
-# Start from the latest Swift nightly main toolchain
-FROM docker.io/ubuntu:latest AS swift
-LABEL org.opencontainers.image.title="Swift Matter Builder"
-LABEL org.opencontainers.image.description="Build environment for swift-matter on esp32c6. Contains esp-idf (master), esp-matter (main), swift (main-snapshot), and dependencies"
+FROM docker.io/ubuntu:latest
+LABEL org.opencontainers.image.title="Swift main snapshot on ubuntu:latest"
+LABEL org.opencontainers.image.description="Base image for esp-swift. Includes the latest swift main snapshot + ubuntu latest"
 LABEL org.opencontainers.image.source=https://github.com/TheNightmanCodeth/esp-swift
 LABEL org.opencontainers.image.licenses=Apache-2.0
 
 # The number of submodules fetched at the same time
-# (Bump this if you've allocated a good chunk of RAM to the builder)
-# Note: Builds continuously stall and fail using apple/container when this is
-# set to i.e., 24. I'm not sure why. I don't know the limit either. 2 usually
-# works. Building with docker isn't quite as spotty but still not great. It's
-# not like setting it to 24 instead is really that much faster anyway. \rant
+## NOTE: If you're using container on macOS instead of docker or you have < 8G
+## memory, you should lower this to something closer to 2.
 ARG GIT_CLONE_JOBS=24
 
 # Install ESP-IDF dependencies
@@ -57,53 +53,3 @@ RUN set -e; \
   && chmod -R o+r /usr/lib/swift \
   && rm -rf latest_toolchain.tar.gz \
   && apt-get purge --auto-remove -y curl
-
-FROM swift AS idf
-# Make Python stfu
-RUN python3 -m pip config set global.break-system-packages true
-
-# Download ESP-IDF
-RUN mkdir -p ~/esp \
-  && cd ~/esp \
-  && git clone \
-  --branch master \ 
-  --depth 1 \
-  --shallow-submodules \
-  --recursive https://github.com/espressif/esp-idf.git \
-  --jobs $GIT_CLONE_JOBS
-
-# Install ESP-IDF
-RUN cd ~/esp/esp-idf \
-  && ./install.sh esp32c6
-
-FROM idf AS matter
-# Install ESP-Matter dependencies (TODO: Check for duplicates. Though apt should ignore them iirc)
-RUN apt-get update \
-  && apt-get install --yes --no-install-recommends \
-  git gcc g++ pkg-config libssl-dev libdbus-1-dev \
-  libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-  python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
-  && rm -rf /var/lib/apt/lists/*
-
-# Download ESP-Matter
-RUN mkdir -p ~/esp \
-  && cd ~/esp \
-  && git clone \
-  --branch main \ 
-  --depth 1 \
-  --shallow-submodules \
-  --recursive https://github.com/espressif/esp-matter.git \
-  --jobs $GIT_CLONE_JOBS
-
-# Download ESP-Matter
-RUN mkdir -p ~/esp \
-  && cd ~/esp/esp-matter/connectedhomeip/connectedhomeip \
-  && ./scripts/checkout_submodules.py --platform esp32 linux --shallow
-
-# Install ESP-Matter
-RUN cd ~/esp/esp-matter \
-  && ./install.sh
-
-# Setup shell environment
-RUN echo '. ~/esp/esp-idf/export.sh > /dev/null' >> ~/.bashrc \
-  && echo '. ~/esp/esp-matter/export.sh > /dev/null' >> ~/.bashrc

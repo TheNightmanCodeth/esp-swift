@@ -21,6 +21,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 jobs:
   build:
+    # runs-on: sprinters:aws:ap-south-1:ubuntu-latest:t3.large:temp=64
     runs-on: self-hosted
     permissions:
       contents: read
@@ -40,6 +41,8 @@ jobs:
         uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
         with:
           cosign-release: 'v2.2.4'
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
       # https://github.com/docker/setup-buildx-action
@@ -68,6 +71,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
+          platforms: linux/amd64,linux/arm64/v8
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
