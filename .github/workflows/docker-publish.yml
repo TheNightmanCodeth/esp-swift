@@ -5,6 +5,13 @@ name: Docker
 # documentation.
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        type: choice
+        description: The tag to publish
+        options:
+          - latest
+          - main
   schedule:
     # Publish every day at 3AM
     - cron: '0 3 * * *'
@@ -74,11 +81,10 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ github.event.inputs.tag || 'main' }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
       # repository is public to avoid leaking data.  If you would like to publish
       # transparency data even for private images, pass --force to cosign below.
