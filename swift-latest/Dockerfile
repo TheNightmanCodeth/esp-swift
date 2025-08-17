@@ -1,4 +1,4 @@
-FROM docker.io/ubuntu:latest
+FROM docker.io/ubuntu:rolling
 LABEL org.opencontainers.image.title="Swift main snapshot on ubuntu:latest"
 LABEL org.opencontainers.image.description="Base image for esp-swift. Includes the latest swift main snapshot + ubuntu latest"
 LABEL org.opencontainers.image.source=https://github.com/TheNightmanCodeth/esp-swift

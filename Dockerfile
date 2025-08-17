@@ -1,5 +1,5 @@
 # Start from the latest Swift nightly main toolchain
-FROM docker.io/ubuntu:latest AS swift
+FROM docker.io/ubuntu:rolling AS swift
 LABEL org.opencontainers.image.title="Swift Matter Builder"
 LABEL org.opencontainers.image.description="Build environment for swift-matter on esp32c6. Contains esp-idf (master), esp-matter (main), swift (main-snapshot), and dependencies"
 LABEL org.opencontainers.image.source=https://github.com/TheNightmanCodeth/esp-swift
